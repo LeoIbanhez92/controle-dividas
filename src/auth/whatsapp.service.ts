@@ -24,6 +24,7 @@ export class WhatsappService {
             return;
         }
 
+        const numeroCompleto = whatsapp.startsWith('55') ? whatsapp : `55${whatsapp}`;
         const url = `${this.baseUrl}/message/sendText/${this.instance}`;
         const mensagem =
             `🔐 *Recuperação de Senha*\n\n` +
@@ -38,7 +39,7 @@ export class WhatsappService {
                 apikey: this.apiKey,
             },
             body: JSON.stringify({
-                number: whatsapp,
+                number: numeroCompleto,
                 text: mensagem,
             }),
         });

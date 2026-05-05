@@ -17,7 +17,7 @@ export class LoginDto {
 }
 
 export class SolicitarRecuperacaoDto {
-    @ApiProperty({ example: '5511999999999', description: 'Número de WhatsApp com DDI e DDD (apenas dígitos)' })
+    @ApiProperty({ example: '11999999999', description: 'Número de WhatsApp com DDD (apenas dígitos, sem o 55)' })
     @IsMobilePhone('pt-BR', { strictMode: false })
     whatsapp: string;
 }
