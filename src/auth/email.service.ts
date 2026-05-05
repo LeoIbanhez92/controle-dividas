@@ -27,12 +27,15 @@ export class EmailService {
         }
 
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            family: 4,
             auth: {
                 user: this.usuario,
                 pass: this.senha,
             },
-        });
+        } as any);
 
         const link = `${this.frontendUrl}/redefinir-senha?token=${token}`;
 
