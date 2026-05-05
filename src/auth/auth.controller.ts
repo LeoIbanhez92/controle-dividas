@@ -45,7 +45,6 @@ export class AuthController {
     }
 
     @Post('recuperar-senha')
-    @HttpCode(HttpStatus.NO_CONTENT)
     solicitarRecuperacao(@Body() body: SolicitarRecuperacaoDto) {
         return this.authService.solicitarRecuperacaoSenha(body.email);
     }

@@ -3,14 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { UsuariosService } from '../usuarios/services/usuarios.service';
-import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly usuariosService: UsuariosService,
         private readonly jwtService: JwtService,
-        private readonly emailService: EmailService,
     ) { }
 
     async login(email: string, senha: string) {
@@ -30,18 +28,17 @@ export class AuthService {
         };
     }
 
-    async solicitarRecuperacaoSenha(email: string): Promise<void> {
+    async solicitarRecuperacaoSenha(email: string): Promise<{ token: string } | null> {
         const usuario = await this.usuariosService.buscarPorEmail(email);
         if (!usuario) {
-            // Retorna sem erro para não expor quais e-mails estão cadastrados
-            return;
+            return null;
         }
 
         const token = randomBytes(32).toString('hex');
         const expiracao = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
         await this.usuariosService.salvarCodigoRecuperacao(usuario.id, token, expiracao);
-        await this.emailService.enviarLinkRecuperacao(email, token);
+        return { token };
     }
 
     async redefinirSenha(token: string, novaSenha: string): Promise<void> {

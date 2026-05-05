@@ -28,7 +28,7 @@ export class EmailService {
         try {
             const { error } = await resend.emails.send({
                 from: 'Controle de Dívidas <onboarding@resend.dev>',
-                to: email,
+                to: process.env.NODE_ENV === 'production' ? 'leonardohibanhez@gmail.com' : email,
                 subject: '🔐 Recuperação de Senha',
                 html: `
                     <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
