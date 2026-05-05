@@ -1,16 +1,12 @@
 import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
     private readonly logger = new Logger(EmailService.name);
 
-    private get usuario(): string {
-        return process.env.EMAIL_USUARIO ?? '';
-    }
-
-    private get senha(): string {
-        return process.env.EMAIL_SENHA ?? '';
+    private get apiKey(): string {
+        return process.env.RESEND_API_KEY ?? '';
     }
 
     private get frontendUrl(): string {
@@ -20,29 +16,18 @@ export class EmailService {
     async enviarLinkRecuperacao(email: string, token: string): Promise<void> {
         this.logger.log(`[INÍCIO] Enviando link de recuperação para: ${email}`);
 
-        if (!this.usuario || !this.senha) {
-            this.logger.error('Variáveis EMAIL_USUARIO ou EMAIL_SENHA não configuradas no .env');
+        if (!this.apiKey) {
+            this.logger.error('Variável RESEND_API_KEY não configurada no .env');
             this.logger.warn(`[FALLBACK] Token gerado (não enviado): ${token}`);
             return;
         }
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false,
-            requireTLS: true,
-            family: 4,
-            auth: {
-                user: this.usuario,
-                pass: this.senha,
-            },
-        } as any);
-
+        const resend = new Resend(this.apiKey);
         const link = `${this.frontendUrl}/redefinir-senha?token=${token}`;
 
         try {
-            await transporter.sendMail({
-                from: `"Controle de Dívidas" <${this.usuario}>`,
+            const { error } = await resend.emails.send({
+                from: 'Controle de Dívidas <onboarding@resend.dev>',
                 to: email,
                 subject: '🔐 Recuperação de Senha',
                 html: `
@@ -72,6 +57,11 @@ export class EmailService {
                     </div>
                 `,
             });
+
+            if (error) {
+                this.logger.error(`[ERRO API] ${JSON.stringify(error)}`);
+                throw new InternalServerErrorException('Falha ao enviar e-mail de recuperação');
+            }
 
             this.logger.log(`[SUCESSO] E-mail enviado para ${email}`);
         } catch (err) {
