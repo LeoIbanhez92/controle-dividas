@@ -28,4 +28,28 @@ export class UsuariosService {
     async buscarPorEmail(email: string): Promise<Usuario | null> {
         return this.usuarioRepository.findOneBy({ email });
     }
+
+    async buscarPorWhatsapp(whatsapp: string): Promise<Usuario | null> {
+        return this.usuarioRepository.findOneBy({ whatsapp });
+    }
+
+    async salvarCodigoRecuperacao(id: number, codigo: string, expiracao: Date): Promise<void> {
+        await this.usuarioRepository.update(id, {
+            codigoRecuperacao: codigo,
+            codigoRecuperacaoExpiracao: expiracao,
+        });
+    }
+
+    async buscarPorCodigoRecuperacao(codigo: string): Promise<Usuario | null> {
+        return this.usuarioRepository.findOneBy({ codigoRecuperacao: codigo });
+    }
+
+    async atualizarSenha(id: number, novaSenha: string): Promise<void> {
+        const hash = await bcrypt.hash(novaSenha, 10);
+        await this.usuarioRepository.update(id, {
+            senha: hash,
+            codigoRecuperacao: null,
+            codigoRecuperacaoExpiracao: null,
+        });
+    }
 }

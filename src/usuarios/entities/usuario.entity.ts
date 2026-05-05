@@ -26,6 +26,16 @@ export class Usuario {
     @Column({ type: 'varchar' })
     senha: string;
 
+    @ApiProperty({ example: '5511999999999', description: 'Número de WhatsApp do usuário (apenas dígitos, com DDI)', maxLength: 20, nullable: true })
+    @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
+    whatsapp: string | null;
+
+    @Column({ type: 'varchar', nullable: true })
+    codigoRecuperacao: string | null;
+
+    @Column({ type: 'timestamp', nullable: true })
+    codigoRecuperacaoExpiracao: Date | null;
+
     @ApiProperty({ type: () => [Divida], description: 'Dívidas do usuário' })
     @OneToMany(() => Divida, (divida) => divida.usuario)
     dividas: Divida[];
