@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsPositive, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, MaxLength, Min } from 'class-validator';
 import { DividasService } from '../services/dividas.service';
 
 export class CreateDividaDto {
@@ -38,6 +38,13 @@ export class CreateDividaDto {
   @ApiProperty({ example: '2026-05-04', description: 'Data de vencimento da primeira parcela (YYYY-MM-DD)' })
   @IsDateString()
   dataVencimentoPrimeiraParcela: string;
+
+  @ApiProperty({ example: 'Maria Silva', description: 'Nome do titular do cartão ou responsável pela dívida (opcional)', required: false, maxLength: 100 })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  nomeTitular?: string;
 }
 
 export class UpdateDividaDto {
@@ -61,6 +68,13 @@ export class UpdateDividaDto {
   @ApiProperty({ example: '2026-05-04', description: 'Data de vencimento da primeira parcela (YYYY-MM-DD)', required: false })
   @IsDateString()
   dataVencimentoPrimeiraParcela?: string;
+
+  @ApiProperty({ example: 'Maria Silva', description: 'Nome do titular do cartão ou responsável pela dívida', required: false, maxLength: 100 })
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  nomeTitular?: string;
 }
 
 @UseGuards(AuthGuard('jwt'))

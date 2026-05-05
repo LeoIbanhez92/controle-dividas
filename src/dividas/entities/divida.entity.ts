@@ -31,6 +31,10 @@ export class Divida {
     @Column({ type: 'date' })
     dataVencimentoPrimeiraParcela: string;
 
+    @ApiProperty({ example: 'Maria Silva', description: 'Nome do titular do cartão ou pessoa responsável pela dívida', maxLength: 100, nullable: true })
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    nomeTitular: string | null;
+
     @ApiProperty({ type: () => Usuario, description: 'Usuário dono da dívida' })
     @ManyToOne(() => Usuario, (usuario) => usuario.dividas, { onDelete: 'CASCADE' })
     usuario: Usuario;
