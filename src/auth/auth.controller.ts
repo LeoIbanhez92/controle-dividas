@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsMobilePhone, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
 import { AuthService } from './auth.service';
 
 export class LoginDto {
@@ -17,17 +17,16 @@ export class LoginDto {
 }
 
 export class SolicitarRecuperacaoDto {
-    @ApiProperty({ example: '11999999999', description: 'Número de WhatsApp com DDD (apenas dígitos, sem o 55)' })
-    @IsMobilePhone('pt-BR', { strictMode: false })
-    whatsapp: string;
+    @ApiProperty({ example: 'joao@email.com', description: 'E-mail cadastrado na conta' })
+    @IsEmail()
+    @MaxLength(150)
+    email: string;
 }
 
 export class RedefinirSenhaDto {
-    @ApiProperty({ example: '123456', description: 'Código de 6 dígitos recebido via WhatsApp' })
+    @ApiProperty({ example: 'abc123...', description: 'Token recebido no link do e-mail' })
     @IsString()
-    @MinLength(6)
-    @MaxLength(6)
-    codigo: string;
+    token: string;
 
     @ApiProperty({ example: 'novaSenha123', description: 'Nova senha com no mínimo 6 e no máximo 20 caracteres', minLength: 6, maxLength: 20 })
     @IsString()
@@ -48,12 +47,12 @@ export class AuthController {
     @Post('recuperar-senha')
     @HttpCode(HttpStatus.NO_CONTENT)
     solicitarRecuperacao(@Body() body: SolicitarRecuperacaoDto) {
-        return this.authService.solicitarRecuperacaoSenha(body.whatsapp);
+        return this.authService.solicitarRecuperacaoSenha(body.email);
     }
 
     @Post('redefinir-senha')
     @HttpCode(HttpStatus.NO_CONTENT)
     redefinirSenha(@Body() body: RedefinirSenhaDto) {
-        return this.authService.redefinirSenha(body.codigo, body.novaSenha);
+        return this.authService.redefinirSenha(body.token, body.novaSenha);
     }
 }

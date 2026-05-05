@@ -11,21 +11,14 @@ export class UsuariosService {
         private readonly usuarioRepository: Repository<Usuario>,
     ) { }
 
-    async criar(nome: string, email: string, senha: string, whatsapp?: string): Promise<Omit<Usuario, 'senha'>> {
+    async criar(nome: string, email: string, senha: string): Promise<Omit<Usuario, 'senha'>> {
         const existe = await this.usuarioRepository.findOneBy({ email });
         if (existe) {
             throw new ConflictException('Email já cadastrado');
         }
 
-        if (whatsapp) {
-            const existeWhatsapp = await this.usuarioRepository.findOneBy({ whatsapp });
-            if (existeWhatsapp) {
-                throw new ConflictException('WhatsApp já cadastrado');
-            }
-        }
-
         const hash = await bcrypt.hash(senha, 10);
-        const usuario = this.usuarioRepository.create({ nome, email, senha: hash, whatsapp: whatsapp ?? null });
+        const usuario = this.usuarioRepository.create({ nome, email, senha: hash });
         const salvo = await this.usuarioRepository.save(usuario);
 
         const { senha: _, ...resultado } = salvo;
@@ -34,10 +27,6 @@ export class UsuariosService {
 
     async buscarPorEmail(email: string): Promise<Usuario | null> {
         return this.usuarioRepository.findOneBy({ email });
-    }
-
-    async buscarPorWhatsapp(whatsapp: string): Promise<Usuario | null> {
-        return this.usuarioRepository.findOneBy({ whatsapp });
     }
 
     async salvarCodigoRecuperacao(id: number, codigo: string, expiracao: Date): Promise<void> {

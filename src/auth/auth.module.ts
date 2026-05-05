@@ -4,8 +4,8 @@ import { PassportModule } from '@nestjs/passport';
 import { UsuariosModule } from '../usuarios/usuarios.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { EmailService } from './email.service';
 import { JwtStrategy } from './jwt.strategy';
-import { WhatsappService } from './whatsapp.service';
 
 @Module({
     imports: [
@@ -17,6 +17,6 @@ import { WhatsappService } from './whatsapp.service';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy, WhatsappService],
+    providers: [AuthService, JwtStrategy, EmailService],
 })
 export class AuthModule { }

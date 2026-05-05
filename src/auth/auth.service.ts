@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { randomInt } from 'crypto';
+import { randomBytes } from 'crypto';
 import { UsuariosService } from '../usuarios/services/usuarios.service';
-import { WhatsappService } from './whatsapp.service';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly usuariosService: UsuariosService,
         private readonly jwtService: JwtService,
-        private readonly whatsappService: WhatsappService,
+        private readonly emailService: EmailService,
     ) { }
 
     async login(email: string, senha: string) {
@@ -30,28 +30,28 @@ export class AuthService {
         };
     }
 
-    async solicitarRecuperacaoSenha(whatsapp: string): Promise<void> {
-        const usuario = await this.usuariosService.buscarPorWhatsapp(whatsapp);
+    async solicitarRecuperacaoSenha(email: string): Promise<void> {
+        const usuario = await this.usuariosService.buscarPorEmail(email);
         if (!usuario) {
-            // Retorna sem erro para não expor quais números estão cadastrados
+            // Retorna sem erro para não expor quais e-mails estão cadastrados
             return;
         }
 
-        const codigo = randomInt(100000, 999999).toString();
+        const token = randomBytes(32).toString('hex');
         const expiracao = new Date(Date.now() + 15 * 60 * 1000); // 15 minutos
 
-        await this.usuariosService.salvarCodigoRecuperacao(usuario.id, codigo, expiracao);
-        await this.whatsappService.enviarCodigo(whatsapp, codigo);
+        await this.usuariosService.salvarCodigoRecuperacao(usuario.id, token, expiracao);
+        await this.emailService.enviarLinkRecuperacao(email, token);
     }
 
-    async redefinirSenha(codigo: string, novaSenha: string): Promise<void> {
-        const usuario = await this.usuariosService.buscarPorCodigoRecuperacao(codigo);
+    async redefinirSenha(token: string, novaSenha: string): Promise<void> {
+        const usuario = await this.usuariosService.buscarPorCodigoRecuperacao(token);
         if (!usuario) {
-            throw new NotFoundException('Código inválido');
+            throw new NotFoundException('Token inválido');
         }
 
         if (!usuario.codigoRecuperacaoExpiracao || usuario.codigoRecuperacaoExpiracao < new Date()) {
-            throw new BadRequestException('Código expirado');
+            throw new BadRequestException('Token expirado');
         }
 
         await this.usuariosService.atualizarSenha(usuario.id, novaSenha);

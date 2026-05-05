@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsMobilePhone, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 import { UsuariosService } from '../services/usuarios.service';
 
 export class CriarUsuarioDto {
@@ -22,10 +22,6 @@ export class CriarUsuarioDto {
     @MaxLength(20)
     senha: string;
 
-    @ApiPropertyOptional({ example: '11999999999', description: 'Número de WhatsApp com DDD (apenas dígitos, sem o 55). Necessário para recuperação de senha.' })
-    @IsOptional()
-    @IsMobilePhone('pt-BR', { strictMode: false })
-    whatsapp?: string;
 }
 
 @Controller('usuarios')
@@ -34,6 +30,6 @@ export class UsuariosController {
 
     @Post('registrar')
     registrar(@Body() body: CriarUsuarioDto) {
-        return this.usuariosService.criar(body.nome, body.email, body.senha, body.whatsapp);
+        return this.usuariosService.criar(body.nome, body.email, body.senha);
     }
 }

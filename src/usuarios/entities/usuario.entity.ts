@@ -26,10 +26,6 @@ export class Usuario {
     @Column({ type: 'varchar' })
     senha: string;
 
-    @ApiProperty({ example: '11999999999', description: 'Número de WhatsApp do usuário com DDD (apenas dígitos, sem o 55)', maxLength: 20, nullable: true })
-    @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
-    whatsapp: string | null;
-
     @Column({ type: 'varchar', nullable: true })
     codigoRecuperacao: string | null;
 
