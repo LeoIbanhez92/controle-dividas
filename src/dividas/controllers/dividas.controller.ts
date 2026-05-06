@@ -14,8 +14,9 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, Max, MaxLength, Min } from 'class-validator';
 import { DividasService } from '../services/dividas.service';
+import { BandeiraCartao } from '../entities/divida.entity';
 
 export class CreateDividaDto {
   @ApiProperty({ example: 'Financiamento do carro', description: 'Descrição da dívida', minLength: 1, maxLength: 255 })
@@ -45,6 +46,11 @@ export class CreateDividaDto {
   @IsNotEmpty()
   @MaxLength(100)
   nomeTitular?: string;
+
+  @ApiProperty({ enum: BandeiraCartao, example: BandeiraCartao.NUBANK, description: 'Bandeira/banco do cartão (opcional)', required: false })
+  @IsOptional()
+  @IsEnum(BandeiraCartao)
+  bandeira?: BandeiraCartao;
 }
 
 export class UpdateDividaDto {
@@ -75,6 +81,16 @@ export class UpdateDividaDto {
   @IsNotEmpty()
   @MaxLength(100)
   nomeTitular?: string;
+
+  @ApiProperty({ enum: BandeiraCartao, example: BandeiraCartao.NUBANK, description: 'Bandeira/banco do cartão', required: false })
+  @IsOptional()
+  @IsEnum(BandeiraCartao)
+  bandeira?: BandeiraCartao;
+
+  @ApiProperty({ example: true, description: 'Marcar dívida como paga neste mês', required: false })
+  @IsOptional()
+  @IsBoolean()
+  pago?: boolean;
 }
 
 @UseGuards(AuthGuard('jwt'))

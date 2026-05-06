@@ -9,6 +9,15 @@ import {
 import { Usuario } from '../../usuarios/entities/usuario.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum BandeiraCartao {
+    SANTANDER = 'santander',
+    ITAU = 'itau',
+    BANCO_DO_BRASIL = 'banco_do_brasil',
+    NUBANK = 'nubank',
+    BRADESCO = 'bradesco',
+    PICPAY = 'picpay',
+}
+
 @Entity('dividas')
 export class Divida {
     @ApiProperty({ example: 1, description: 'ID da dívida' })
@@ -34,6 +43,14 @@ export class Divida {
     @ApiProperty({ example: 'Maria Silva', description: 'Nome do titular do cartão ou pessoa responsável pela dívida', maxLength: 100, nullable: true })
     @Column({ type: 'varchar', length: 100, nullable: true })
     nomeTitular: string | null;
+
+    @ApiProperty({ enum: BandeiraCartao, example: BandeiraCartao.NUBANK, description: 'Bandeira/banco do cartão', nullable: true, required: false })
+    @Column({ type: 'enum', enum: BandeiraCartao, nullable: true })
+    bandeira: BandeiraCartao | null;
+
+    @ApiProperty({ example: false, description: 'Indica se a dívida do cartão já foi paga neste mês', default: false })
+    @Column({ type: 'boolean', default: false })
+    pago: boolean;
 
     @ApiProperty({ type: () => Usuario, description: 'Usuário dono da dívida' })
     @ManyToOne(() => Usuario, (usuario) => usuario.dividas, { onDelete: 'CASCADE' })
